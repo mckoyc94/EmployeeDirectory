@@ -1,3 +1,4 @@
+DROP DATABASE IF EXISTS theRockClub;
 CREATE DATABASE theRockClub;
 USE theRockClub;
 
@@ -11,7 +12,7 @@ CREATE TABLE employees (
 );
 
 CREATE TABLE role (
-    id int,
+    id int AUTO_INCREMENT,
     title VARCHAR(30) NOT NULL,
     salary DECIMAL,
     department_id int NOT NULL,
@@ -19,7 +20,7 @@ CREATE TABLE role (
 );
 
 CREATE TABLE department (
-    id int,
+    id int AUTO_INCREMENT,
     name VARCHAR(30),
     PRIMARY KEY (id)
 );
