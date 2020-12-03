@@ -1,0 +1,20 @@
+{
+  "name": "develop",
+  "version": "1.0.0",
+  "description": "App that allows employers to manage their employees",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github.com/mckoyc94/EmployeeDirectory"
+  },
+  "author": "Conor",
+  "license": "MIT",
+  "dependencies": {
+    "console.table": "^0.10.0",
+    "inquirer": "^7.3.3",
+    "mysql": "^2.18.1"
+  }
+}
