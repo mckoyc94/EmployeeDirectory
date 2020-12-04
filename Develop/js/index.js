@@ -20,13 +20,39 @@ connection.connect(err => {
       initiateHome()
 })
 
+//Initial Actions for User to Take
+const userActions = ['Veiw All Employees', 'Veiw Department', 'Veiw Role', 'Veiw Specific Employee', 'Add to Database', 'Quit' ]
+
 const initiateHome = () => {
+    // Gives User options
     inquirer.prompt({
         type: 'list',
         message: 'What would you like to do?',
         name: 'action',
-        choices: ['Veiw All Employees', 'Veiw Employees by Department', 'Veiw Employees by Role', 'Veiw Employees by Manager', 'Add to Database', 'Quit' ]
+        choices: userActions
     }).then(results => {
-        console.log("Results: ", results )
+        console.log("Results: ", results.action)
+        let action = results.action
+        
+        //Sends User to next screen based off their choice
+        if (action === userActions[0]) {
+            console.log('Veiw All')
+            initiateHome()
+        } else if (action === userActions[1]){
+            console.log('Veiw Department')
+            initiateHome()
+        } else if (action === userActions[2]){
+            console.log('Veiw Role')
+            initiateHome()
+        } else if (action === userActions[3]){
+            console.log('Veiw Employee')
+            initiateHome()
+        } else if (action === userActions[4]) {
+            console.log('Edit Database')
+            connection.end();
+        } else {
+            connection.end();
+        }
+    
     })
 }
