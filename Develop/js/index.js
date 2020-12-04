@@ -36,17 +36,16 @@ const initiateHome = () => {
         
         //Sends User to next screen based off their choice
         if (action === userActions[0]) {
-            console.log('View All')
             viewAll()
         } else if (action === userActions[1]){
             console.log('View Department')
-            initiateHome()
+            nextQuestion('department')
         } else if (action === userActions[2]){
             console.log('View Role')
-            initiateHome()
+            nextQuestion('role')
         } else if (action === userActions[3]){
             console.log('View Employee')
-            initiateHome()
+            nextQuestion('employees')
         } else if (action === userActions[4]) {
             console.log('Edit Database')
             connection.end();
@@ -69,4 +68,26 @@ const viewAll = () => {
         console.table(result)
         initiateHome()
     })
+}
+
+const nextQuestion = (view) => {
+    let query = '';
+    if (view === 'department'){
+        query = `SELECT department FROM ${view}`
+    } else if (view === 'role'){
+        query = `SELECT title FROM ${view}`
+    } else {
+        query = `SELECT first_name, last_name FROM ${view}`;
+        view = 'employee'
+    }
+    connection.query(query, (err, result) => {
+        if (err) throw err;
+        inquirer.prompt({
+            
+        })
+        console.table(result)
+        console.log(view)
+        initiateHome()
+    })
+    
 }
