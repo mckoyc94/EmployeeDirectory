@@ -4,7 +4,7 @@ USE theRockClub;
 
 CREATE TABLE department (
     id int AUTO_INCREMENT,
-    name VARCHAR(30),
+    department VARCHAR(30),
     PRIMARY KEY (id)
 );
 

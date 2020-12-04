@@ -37,7 +37,7 @@ const initiateHome = () => {
         //Sends User to next screen based off their choice
         if (action === userActions[0]) {
             console.log('View All')
-            initiateHome()
+            viewAll()
         } else if (action === userActions[1]){
             console.log('View Department')
             initiateHome()
@@ -58,5 +58,15 @@ const initiateHome = () => {
 }
 
 const viewAll = () => {
-    let query = 'SELECT * FROM employees'
+    let query = `SELECT e.id, e.first_name, e.last_name, title, department.department, CONCAT(m.first_name,' ', m.last_name) as "Manager" 
+    FROM employees e
+    INNER JOIN role ON role.id = e.role_id 
+    INNER JOIN department ON department.id = role.department_id
+    LEFT JOIN employees m ON e.manager_id = m.id`
+
+    connection.query(query, (err, result) => {
+        if (err) throw err;
+        console.table(result)
+        initiateHome()
+    })
 }

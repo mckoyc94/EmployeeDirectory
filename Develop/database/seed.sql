@@ -1,9 +1,9 @@
 -- Departments
-INSERT INTO department (name) VALUES ('Management');
-INSERT INTO department (name) VALUES ('Desk');
-INSERT INTO department (name) VALUES ('Junior_Programs');
-INSERT INTO department (name) VALUES ('Belayers');
-INSERT INTO department (name) VALUES ('Setters');
+INSERT INTO department (department) VALUES ('Management');
+INSERT INTO department (department) VALUES ('Desk');
+INSERT INTO department (department) VALUES ('Junior_Programs');
+INSERT INTO department (department) VALUES ('Belayers');
+INSERT INTO department (department) VALUES ('Setters');
 
 -- Roles
 INSERT INTO role (title, salary, department_id) VALUES ('Gym Director', 50000, 1);
@@ -56,15 +56,3 @@ INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES ('Chri
 INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES ('Chris', 'Moyle', 10, 1);
 INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES ('Zac', 'Belida', 11, 4);
 INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES ('Josh', 'Colberg', 11, 4);
-
-
-
-
-
-
-
-
-
-
-
-
