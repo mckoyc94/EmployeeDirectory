@@ -21,7 +21,7 @@ connection.connect(err => {
 })
 
 //Initial Actions for User to Take
-const userActions = ['Veiw All Employees', 'Veiw Department', 'Veiw Role', 'Veiw Specific Employee', 'Add to Database', 'Quit' ]
+const userActions = ['View All Employees', 'View Department', 'View Role', 'View Specific Employee', 'Add to Database', 'Quit' ]
 
 const initiateHome = () => {
     // Gives User options
@@ -36,16 +36,16 @@ const initiateHome = () => {
         
         //Sends User to next screen based off their choice
         if (action === userActions[0]) {
-            console.log('Veiw All')
+            console.log('View All')
             initiateHome()
         } else if (action === userActions[1]){
-            console.log('Veiw Department')
+            console.log('View Department')
             initiateHome()
         } else if (action === userActions[2]){
-            console.log('Veiw Role')
+            console.log('View Role')
             initiateHome()
         } else if (action === userActions[3]){
-            console.log('Veiw Employee')
+            console.log('View Employee')
             initiateHome()
         } else if (action === userActions[4]) {
             console.log('Edit Database')
@@ -55,4 +55,8 @@ const initiateHome = () => {
         }
     
     })
+}
+
+const viewAll = () => {
+    let query = 'SELECT * FROM employees'
 }
