@@ -72,10 +72,26 @@ const viewAll = () => {
 
 const nextQuestion = (view) => {
     let query = '';
+    let column = '';
+    let list = '';
     if (view === 'department'){
         query = `SELECT department FROM ${view}`
+        list = (answer) => {
+            let choiceArr = []
+            for (let i = 0; i < answer.length; i++){
+                choiceArr.push(answer[i].department)
+            }
+            return choiceArr
+        }
     } else if (view === 'role'){
         query = `SELECT title FROM ${view}`
+        list = (answer) => {
+            let choiceArr = []
+            for (let i = 0; i < answer.length; i++){
+                choiceArr.push(answer[i].title)
+            }
+            return choiceArr
+        }
     } else {
         query = `SELECT first_name, last_name FROM ${view}`;
         view = 'employee'
@@ -83,11 +99,14 @@ const nextQuestion = (view) => {
     connection.query(query, (err, result) => {
         if (err) throw err;
         inquirer.prompt({
-            
+            name:"choice",
+            type: "list",
+            choices: list(result),
+            message: `Which ${view} would you like to look at?`
+        }).then(res => {
+            console.log(res.choice)
+            initiateHome()
         })
-        console.table(result)
-        console.log(view)
-        initiateHome()
     })
     
 }
