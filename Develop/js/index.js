@@ -94,7 +94,17 @@ const nextQuestion = (view) => {
         }
     } else {
         query = `SELECT first_name, last_name FROM ${view}`;
-        view = 'employee'
+        view = 'employee';
+        list = (answer) => {
+            let choiceArr = []
+            for (let i = 0; i < answer.length; i++){
+                let firstName = answer[i].first_name
+                let lastName = answer[i].last_name
+                let employee = firstName + " " + lastName
+                choiceArr.push(employee)
+            }
+            return choiceArr
+        }
     }
     connection.query(query, (err, result) => {
         if (err) throw err;
