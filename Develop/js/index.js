@@ -257,7 +257,7 @@ const addtoDatabase = () => {
                 type: "input",
                 message: "What's the name of the new department?"
             }).then(res => {
-                connection.query(`INSERT INTO deparment (department) VALUES "${res.newDept}"`, (err, results) =>{
+                connection.query(`INSERT INTO department (department) VALUES ("${res.newDept}")`, (err, results) =>{
                     if (err) throw err;
                     console.log(`${res.newDept} added to Department table`)
                     initiateHome()
