@@ -242,7 +242,7 @@ const addtoDatabase = () => {
                         let managerId = manage[0].id
                         connection.query(`INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES ("${firstName}", "${lastName}", ${roleId}, ${managerId})`, (err, add) => {
                             if (err) throw err;
-                            console.log(`${firstName} ${lastName} has been added to Employees`)
+                            console.log(`${firstName} ${lastName} has been added to Employees table`)
                             initiateHome()
                         })
                     })
@@ -251,6 +251,22 @@ const addtoDatabase = () => {
 
             })
         })
+        } else if (answer === "Department"){
+            inquirer.prompt({
+                name: "newDept",
+                type: "input",
+                message: "What's the name of the new department?"
+            }).then(res => {
+                connection.query(`INSERT INTO deparment (department) VALUES "${res.newDept}"`, (err, results) =>{
+                    if (err) throw err;
+                    console.log(`${res.newDept} added to Department table`)
+                    initiateHome()
+                })
+            })
+        } else {
+            inquirer.prompt({
+
+            })
         }
 
     })
