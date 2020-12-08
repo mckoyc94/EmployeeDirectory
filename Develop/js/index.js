@@ -190,5 +190,68 @@ const updateEmployee = () => {
 }
 
 const addtoDatabase = () => {
-    
+    inquirer.prompt({
+        name: "adding",
+        message: "What Database would you like to add to?",
+        choices: ["Employees", "Department", "Role"],
+        type: "list"
+    }).then(res => {
+        let answer = res.adding
+
+        if (answer === "Employees"){
+            let roleList = ""
+            
+            connection.query("SELECT title FROM role", (err, result) => {
+                if (err) throw err ;
+                roleList = (answer) =>{
+                      let choiceArr = []
+                      for (let i = 0; i < answer.length; i++){
+                          choiceArr.push(answer[i].title)
+                      }
+                      return choiceArr
+                }  
+                
+            inquirer.prompt([{
+                name: "firstName",
+                type: "input",
+                message: "First Name?"
+            },{
+                name: "lastName",
+                type: "input",
+                message: "Last Name?"
+            },{
+                name: "title",
+                type: "list",
+                choices: roleList(result),
+                message: "What is their position?"
+            }, {
+                name: "manager",
+                type: "list",
+                choices: ["Jordan Pacheco", "Jenny Fryer", "Daniel Gruza", "Xavier Torriente"]
+            }]).then(employee => {
+                let {firstName, lastName, manager} = employee
+                let managerName = manager.split(" ")
+                let managerLast = managerName[1]
+                console.log(employee)
+                
+                connection.query(`Select * FROM role WHERE title = "${employee.title}"`, (err, role) => {
+                    if (err) throw err;
+                    let roleId =role[0].id
+                    connection.query( `SELECT * FROM employees WHERE last_name = "${managerLast}"`, (err, manage) =>{
+                        if (err) throw err;
+                        let managerId = manage[0].id
+                        connection.query(`INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES ("${firstName}", "${lastName}", ${roleId}, ${managerId})`, (err, add) => {
+                            if (err) throw err;
+                            console.log(`${firstName} ${lastName} has been added to Employees`)
+                            initiateHome()
+                        })
+                    })
+                })
+                
+
+            })
+        })
+        }
+
+    })
 }
