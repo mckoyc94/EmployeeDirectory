@@ -72,7 +72,6 @@ const viewAll = () => {
 
 const nextQuestion = (view) => {
     let query = '';
-    let column = '';
     let list = '';
     if (view === 'department'){
         query = `SELECT department FROM ${view}`
@@ -114,9 +113,52 @@ const nextQuestion = (view) => {
             choices: list(result),
             message: `Which ${view} would you like to look at?`
         }).then(res => {
-            console.log(res.choice)
-            initiateHome()
+            answer = res.choice
+            updateOrDelete(view, answer)
         })
     })
     
+}
+
+const updateOrDelete = (type, answer) => {
+    let questions = []
+    let chosenQuery = ""
+
+    if (type === 'employee') {
+        questions = ["Update", "Delete", "Home"]
+        name = answer.split(" ")
+        console.log(name)
+        lastName = name[1]
+        chosenQuery = `SELECT e.id, e.first_name, e.last_name, title, department.department, CONCAT(m.first_name,' ', m.last_name) as "Manager" 
+        FROM employees e
+        INNER JOIN role ON role.id = e.role_id 
+        INNER JOIN department ON department.id = role.department_id
+        LEFT JOIN employees m ON e.manager_id = m.id
+        WHERE e.last_name = ${lastName}`
+    } else if (type === 'department') {
+        questions = ["Delete All", "Home"]
+        chosenQuery = `SELECT e.id, e.first_name, e.last_name, title, department.department, CONCAT(m.first_name,' ', m.last_name) as "Manager" 
+        FROM employees e
+        INNER JOIN role ON role.id = e.role_id 
+        INNER JOIN department ON department.id = role.department_id
+        LEFT JOIN employees m ON e.manager_id = m.id
+        WHERE ${answer} = ${answer}`
+    } else {
+        questions = ["Delete All", "Home"]
+        chosenQuery = `SELECT e.id, e.first_name, e.last_name, title, department.department, CONCAT(m.first_name,' ', m.last_name) as "Manager" 
+        FROM employees e
+        INNER JOIN role ON role.id = e.role_id 
+        INNER JOIN department ON department.id = role.department_id
+        LEFT JOIN employees m ON e.manager_id = m.id
+        WHERE title = ${answer}`
+    }
+
+    inquirer.prompt({
+        message: "What would you like to do?",
+        type: "list",
+        choices: questions,
+        name: "nextStep"
+    }).then(res => {
+        initiateHome()
+    })
 }
