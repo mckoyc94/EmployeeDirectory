@@ -123,42 +123,63 @@ const nextQuestion = (view) => {
 const updateOrDelete = (type, answer) => {
     let questions = []
     let chosenQuery = ""
-
+    let table =""
+    let where =""
     if (type === 'employee') {
+        let name = answer.split(" ")
+        let lastName = name[1]
+        table = "employees"
+        where = "last_name"
         questions = ["Update", "Delete", "Home"]
-        name = answer.split(" ")
-        console.log(name)
-        lastName = name[1]
         chosenQuery = `SELECT e.id, e.first_name, e.last_name, title, department.department, CONCAT(m.first_name,' ', m.last_name) as "Manager" 
         FROM employees e
         INNER JOIN role ON role.id = e.role_id 
         INNER JOIN department ON department.id = role.department_id
         LEFT JOIN employees m ON e.manager_id = m.id
-        WHERE e.last_name = ${lastName}`
+        WHERE e.last_name = "${lastName}"`
     } else if (type === 'department') {
-        questions = ["Delete All", "Home"]
+        table = type
+        where = type
+        questions = ["Delete", "Home"]
         chosenQuery = `SELECT e.id, e.first_name, e.last_name, title, department.department, CONCAT(m.first_name,' ', m.last_name) as "Manager" 
         FROM employees e
         INNER JOIN role ON role.id = e.role_id 
         INNER JOIN department ON department.id = role.department_id
         LEFT JOIN employees m ON e.manager_id = m.id
-        WHERE ${answer} = ${answer}`
+        WHERE ${where} = "${answer}"`
     } else {
-        questions = ["Delete All", "Home"]
+        table = "role"
+        where = "title"
+        questions = ["Delete", "Home"]
         chosenQuery = `SELECT e.id, e.first_name, e.last_name, title, department.department, CONCAT(m.first_name,' ', m.last_name) as "Manager" 
         FROM employees e
         INNER JOIN role ON role.id = e.role_id 
         INNER JOIN department ON department.id = role.department_id
         LEFT JOIN employees m ON e.manager_id = m.id
-        WHERE title = ${answer}`
+        WHERE title = "${answer}"`
     }
 
-    inquirer.prompt({
-        message: "What would you like to do?",
-        type: "list",
-        choices: questions,
-        name: "nextStep"
-    }).then(res => {
-        initiateHome()
+    connection.query(chosenQuery, (err, results) => {
+        if (err) console.log(err);
+        console.table(results)
+        
+        inquirer.prompt({
+            message: "What would you like to do?",
+            type: "list",
+            choices: questions,
+            name: "nextStep"
+        }).then(res => {
+            let action = res.nextStep
+            
+            if (action === "Delete"){
+                query = `DELETE FROM ${table} WHERE ${where} = "${answer}"`
+                
+                if (type === 'Employee'){
+                    query = `DELETE FROM ${table} WHERE ${where} = "${lastName}"`
+                }
+                console.log(`${answer} was deleted from ${table}`)
+                initiateHome()
+            }
+        })
     })
 }
