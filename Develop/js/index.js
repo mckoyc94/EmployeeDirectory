@@ -179,6 +179,10 @@ const updateOrDelete = (type, answer) => {
                 }
                 console.log(`${answer} was deleted from ${table}`)
                 initiateHome()
+            } else if (action === "Update"){
+
+            } else {
+                initiateHome()
             }
         })
     })
