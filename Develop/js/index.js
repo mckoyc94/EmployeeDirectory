@@ -38,17 +38,14 @@ const initiateHome = () => {
         if (action === userActions[0]) {
             viewAll()
         } else if (action === userActions[1]){
-            console.log('View Department')
             nextQuestion('department')
         } else if (action === userActions[2]){
-            console.log('View Role')
             nextQuestion('role')
         } else if (action === userActions[3]){
-            console.log('View Employee')
             nextQuestion('employees')
         } else if (action === userActions[4]) {
             console.log('Edit Database')
-            connection.end();
+            addtoDatabase()
         } else {
             connection.end();
         }
@@ -180,10 +177,18 @@ const updateOrDelete = (type, answer) => {
                 console.log(`${answer} was deleted from ${table}`)
                 initiateHome()
             } else if (action === "Update"){
-
+                updateEmployee()
             } else {
                 initiateHome()
             }
         })
     })
+}
+
+const updateEmployee = () => {
+
+}
+
+const addtoDatabase = () => {
+    
 }
