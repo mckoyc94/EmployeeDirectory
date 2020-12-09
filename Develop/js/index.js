@@ -31,7 +31,6 @@ const initiateHome = () => {
         name: 'action',
         choices: userActions
     }).then(results => {
-        console.log("Results: ", results.action)
         let action = results.action
         
         //Sends User to next screen based off their choice
@@ -169,13 +168,21 @@ const updateOrDelete = (type, answer) => {
             let action = res.nextStep
             
             if (action === "Delete"){
-                query = `DELETE FROM ${table} WHERE ${where} = "${answer}"`
-                
-                if (type === 'Employee'){
-                    query = `DELETE FROM ${table} WHERE ${where} = "${lastName}"`
-                }
-                console.log(`${answer} was deleted from ${table}`)
-                initiateHome()
+                inquirer.prompt({
+                    name: "confirm",
+                    message: `This will permantly delete this ${type} and anything associated with it. Are you sure you want to proceed?`,
+                    type: "confirm"
+                }).then(choice => {
+                    if (choice.confirm){
+                        query = `DELETE FROM ${table} WHERE ${where} = "${answer}"`
+                        
+                        if (type === 'Employee'){
+                            query = `DELETE FROM ${table} WHERE ${where} = "${lastName}"`
+                        }
+                        console.log(`${answer} was deleted from ${table}`)
+                        initiateHome()
+                    } else {initiateHome()}
+                })
             } else if (action === "Update"){
                 updateEmployee()
             } else {
@@ -193,7 +200,7 @@ const addtoDatabase = () => {
     inquirer.prompt({
         name: "adding",
         message: "What Database would you like to add to?",
-        choices: ["Employees", "Department", "Role"],
+        choices: ["Employees", "Department", "Role", "Back"],
         type: "list"
     }).then(res => {
         let answer = res.adding
@@ -211,46 +218,44 @@ const addtoDatabase = () => {
                       return choiceArr
                 }  
                 
-            inquirer.prompt([{
-                name: "firstName",
-                type: "input",
-                message: "First Name?"
-            },{
-                name: "lastName",
-                type: "input",
-                message: "Last Name?"
-            },{
-                name: "title",
-                type: "list",
-                choices: roleList(result),
-                message: "What is their position?"
-            }, {
-                name: "manager",
-                type: "list",
-                choices: ["Jordan Pacheco", "Jenny Fryer", "Daniel Gruza", "Xavier Torriente"]
-            }]).then(employee => {
-                let {firstName, lastName, manager} = employee
-                let managerName = manager.split(" ")
-                let managerLast = managerName[1]
-                console.log(employee)
-                
-                connection.query(`Select * FROM role WHERE title = "${employee.title}"`, (err, role) => {
-                    if (err) throw err;
-                    let roleId =role[0].id
-                    connection.query( `SELECT * FROM employees WHERE last_name = "${managerLast}"`, (err, manage) =>{
+                inquirer.prompt([{
+                    name: "firstName",
+                    type: "input",
+                    message: "First Name?"
+                },{
+                    name: "lastName",
+                    type: "input",
+                    message: "Last Name?"
+                },{
+                    name: "title",
+                    type: "list",
+                    choices: roleList(result),
+                    message: "What is their position?"
+                }, {
+                    name: "manager",
+                    type: "list",
+                    choices: ["Jordan Pacheco", "Jenny Fryer", "Daniel Gruza", "Xavier Torriente"]
+                }]).then(employee => {
+                    let {firstName, lastName, manager} = employee
+                    let managerName = manager.split(" ")
+                    let managerLast = managerName[1]
+                    console.log(employee)
+
+                    connection.query(`Select * FROM role WHERE title = "${employee.title}"`, (err, role) => {
                         if (err) throw err;
-                        let managerId = manage[0].id
-                        connection.query(`INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES ("${firstName}", "${lastName}", ${roleId}, ${managerId})`, (err, add) => {
+                        let roleId =role[0].id
+                        connection.query( `SELECT * FROM employees WHERE last_name = "${managerLast}"`, (err, manage) =>{
                             if (err) throw err;
-                            console.log(`${firstName} ${lastName} has been added to Employees table`)
-                            initiateHome()
+                            let managerId = manage[0].id
+                            connection.query(`INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES ("${firstName}", "${lastName}", ${roleId}, ${managerId})`, (err, add) => {
+                                if (err) throw err;
+                                console.log(`${firstName} ${lastName} has been added to Employees table`)
+                                initiateHome()
+                            })
                         })
                     })
                 })
-                
-
             })
-        })
         } else if (answer === "Department"){
             inquirer.prompt({
                 name: "newDept",
@@ -263,11 +268,45 @@ const addtoDatabase = () => {
                     initiateHome()
                 })
             })
-        } else {
-            inquirer.prompt({
+        } else if (answer === "Role"){           
+            connection.query("SELECT department FROM department", (err, result) => {
+                if (err) throw err ;
+                deptList = (answer) =>{
+                      let choiceArr = []
+                      for (let i = 0; i < answer.length; i++){
+                          choiceArr.push(answer[i].department)
+                      }
+                      return choiceArr
+                }
 
+                inquirer.prompt([{
+                    name: "title",
+                    type: "input",
+                    message: "What's the name of the new role?"
+                },{
+                    name:"salary",
+                    type: "number",
+                    message: "How much do they make a year?"
+                },{
+                    name: "dept",
+                    type: "list",
+                    choices: deptList(result),
+                    message: "What Department does it belong to?"
+                }]).then(role => {
+                    console.log(role)
+                    let {title, salary, dept} = role
+                    connection.query(`SELECT * FROM department WHERE department = "${dept}"`, (err, dep) =>{
+                        if (err) throw err;
+                        let deptID = dep[0].id;
+                        connection.query(`INSERT INTO role (title, salary, department_id) VALUES ("${title}","${salary}","${deptID}")`, (err, cb) =>{
+                            if (err) throw err;
+                            console.log(`${title} added to Role table`)
+                            initiateHome()
+                        })
+                    })
+                })
             })
-        }
-
+        } else {initiateHome()}
+        
     })
 }
