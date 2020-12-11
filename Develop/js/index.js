@@ -121,9 +121,10 @@ const updateOrDelete = (type, answer) => {
     let chosenQuery = ""
     let table =""
     let where =""
+    let lastName =""
     if (type === 'employee') {
         let name = answer.split(" ")
-        let lastName = name[1]
+        lastName = name[1]
         table = "employees"
         where = "last_name"
         questions = ["Update", "Delete", "Home"]
@@ -166,7 +167,7 @@ const updateOrDelete = (type, answer) => {
             name: "nextStep"
         }).then(res => {
             let action = res.nextStep
-            
+
             if (action === "Delete"){
                 inquirer.prompt({
                     name: "confirm",
@@ -179,11 +180,15 @@ const updateOrDelete = (type, answer) => {
                         if (type === 'Employee'){
                             query = `DELETE FROM ${table} WHERE ${where} = "${lastName}"`
                         }
-                        console.log(`${answer} was deleted from ${table}`)
-                        initiateHome()
+                        connection.query(query, (err) =>{
+                            if (err) throw err;
+                            console.log(`${answer} was deleted from ${table}`)
+                            initiateHome()
+                        })
                     } else {initiateHome()}
                 })
             } else if (action === "Update"){
+                console.log("lastname", lastName)
                 updateEmployee()
             } else {
                 initiateHome()
@@ -192,8 +197,68 @@ const updateOrDelete = (type, answer) => {
     })
 }
 
-const updateEmployee = () => {
-
+const updateEmployee = (employee) => {
+    connection.query(`SELECT * FROM employees WHERE last_name = ${employee}`, (err, res) => {
+        if (err) throw err;
+        inquirer.prompt({
+            name: "column",
+            type: "list",
+            message: "What would you like to change?",
+            choices: ["First Name", "Last Name", "Position", "Nothing"]
+        }).then(answer => {
+            if (answer.choice === "First Name"){
+                inquirer.prompt({
+                    name: "change",
+                    type: "input"
+                }).then(name => {
+                    connection.query(`UPDATE employees SET first_name = ${name.change} WHERE id = ${res[0].id}`, (err, cb) =>{
+                        if (err) throw err;
+                        console.log(`${res[0].first_name} ${res[0].last_name} has successfully changed name to ${name.change} ${res[0].last_name}`)
+                        initiateHome()
+                    })
+                })
+            } else if (answer.choice === "Last Name"){
+                inquirer.prompt({
+                    name: "change",
+                    type: "input"
+                }).then(name => {
+                    connection.query(`UPDATE employees SET last_name = ${name.change} WHERE id = ${res[0].id}`, (err, cb) =>{
+                        if (err) throw err;
+                        console.log(`${res[0].first_name} ${res[0].last_name} has successfully changed name to ${res[0].first_name} ${name.change} `)
+                        initiateHome()
+                    })
+                })
+            } else if (answer.choice === "Position"){
+                connection.query(`SELECT * FROM role`, (err, result) => {
+                    newArray = (answer) =>{
+                        let choiceArr = []
+                        for (let i = 0; i < answer.length; i++){
+                            choiceArr.push(answer[i].title)
+                        }
+                        return choiceArr
+                    } 
+                    
+                    let roleList = newArray(result)
+                    
+                    inquirer.prompt({
+                        name: "change",
+                        type: "list",
+                        choices: roleList,
+                        message: "What position would you like to change to?"
+                    }).then(pos => {
+                    
+                        let roleID = roleList.filter(id => {
+                             if(pos.change === roleList.title){
+                                return roleList.id
+                            }
+                        })
+                        console.log("roleID :", roleID)
+                        // connection.query(`UPDATE employees SET `)
+                    })
+                })
+            } else {initiateHome()}
+        })
+    })
 }
 
 const addtoDatabase = () => {
@@ -239,7 +304,6 @@ const addtoDatabase = () => {
                     let {firstName, lastName, manager} = employee
                     let managerName = manager.split(" ")
                     let managerLast = managerName[1]
-                    console.log(employee)
 
                     connection.query(`Select * FROM role WHERE title = "${employee.title}"`, (err, role) => {
                         if (err) throw err;
@@ -293,7 +357,6 @@ const addtoDatabase = () => {
                     choices: deptList(result),
                     message: "What Department does it belong to?"
                 }]).then(role => {
-                    console.log(role)
                     let {title, salary, dept} = role
                     connection.query(`SELECT * FROM department WHERE department = "${dept}"`, (err, dep) =>{
                         if (err) throw err;
