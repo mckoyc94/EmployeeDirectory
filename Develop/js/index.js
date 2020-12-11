@@ -183,13 +183,14 @@ const updateOrDelete = (type, answer) => {
                         connection.query(query, (err) =>{
                             if (err) throw err;
                             console.log(`${answer} was deleted from ${table}`)
+                            console.log("query: ", query)
                             initiateHome()
                         })
                     } else {initiateHome()}
                 })
             } else if (action === "Update"){
-                console.log("lastname", lastName)
-                updateEmployee()
+                console.log("last Name: ", lastName)
+                updateEmployee(lastName)
             } else {
                 initiateHome()
             }
@@ -198,37 +199,40 @@ const updateOrDelete = (type, answer) => {
 }
 
 const updateEmployee = (employee) => {
-    connection.query(`SELECT * FROM employees WHERE last_name = ${employee}`, (err, res) => {
+    connection.query(`SELECT * FROM employees WHERE last_name = "${employee}"`, (err, res) => {
         if (err) throw err;
+        console.log(res)
         inquirer.prompt({
             name: "column",
             type: "list",
             message: "What would you like to change?",
             choices: ["First Name", "Last Name", "Position", "Nothing"]
         }).then(answer => {
-            if (answer.choice === "First Name"){
+            console.log("answer :", answer)
+            console.log[answer.column]
+            if (answer.column === "First Name"){
                 inquirer.prompt({
                     name: "change",
                     type: "input"
                 }).then(name => {
-                    connection.query(`UPDATE employees SET first_name = ${name.change} WHERE id = ${res[0].id}`, (err, cb) =>{
+                    connection.query(`UPDATE employees SET first_name = "${name.change}" WHERE id = ${res[0].id}`, (err, cb) =>{
                         if (err) throw err;
                         console.log(`${res[0].first_name} ${res[0].last_name} has successfully changed name to ${name.change} ${res[0].last_name}`)
                         initiateHome()
                     })
                 })
-            } else if (answer.choice === "Last Name"){
+            } else if (answer.column === "Last Name"){
                 inquirer.prompt({
                     name: "change",
                     type: "input"
                 }).then(name => {
-                    connection.query(`UPDATE employees SET last_name = ${name.change} WHERE id = ${res[0].id}`, (err, cb) =>{
+                    connection.query(`UPDATE employees SET last_name = "${name.change}" WHERE id = ${res[0].id}`, (err, cb) =>{
                         if (err) throw err;
                         console.log(`${res[0].first_name} ${res[0].last_name} has successfully changed name to ${res[0].first_name} ${name.change} `)
                         initiateHome()
                     })
                 })
-            } else if (answer.choice === "Position"){
+            } else if (answer.column === "Position"){
                 connection.query(`SELECT * FROM role`, (err, result) => {
                     newArray = (answer) =>{
                         let choiceArr = []
@@ -254,6 +258,7 @@ const updateEmployee = (employee) => {
                         })
                         console.log("roleID :", roleID)
                         // connection.query(`UPDATE employees SET `)
+                        initiateHome()
                     })
                 })
             } else {initiateHome()}
@@ -304,6 +309,8 @@ const addtoDatabase = () => {
                     let {firstName, lastName, manager} = employee
                     let managerName = manager.split(" ")
                     let managerLast = managerName[1]
+                    firstName = firstName.trim()
+                    lastName = lastName.trim()
 
                     connection.query(`Select * FROM role WHERE title = "${employee.title}"`, (err, role) => {
                         if (err) throw err;
