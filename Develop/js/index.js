@@ -201,15 +201,12 @@ const updateOrDelete = (type, answer) => {
 const updateEmployee = (employee) => {
     connection.query(`SELECT * FROM employees WHERE last_name = "${employee}"`, (err, res) => {
         if (err) throw err;
-        console.log(res)
-        inquirer.prompt({
+            inquirer.prompt({
             name: "column",
             type: "list",
             message: "What would you like to change?",
             choices: ["First Name", "Last Name", "Position", "Nothing"]
         }).then(answer => {
-            console.log("answer :", answer)
-            console.log[answer.column]
             if (answer.column === "First Name"){
                 inquirer.prompt({
                     name: "change",
@@ -258,7 +255,7 @@ const updateEmployee = (employee) => {
                         }
                         
                         console.log("roleID :", roleID)
-                        connection.query(`UPDATE employees SET role_id = ${roleID} `, err => {
+                        connection.query(`UPDATE employees SET role_id = ${roleID} WHERE last_name = "${res[0].last_name}"`, err => {
                             if (err) throw err;
                             console.log(`${res[0].first_name} ${res[0].last_name} has successfully changed postition to ${postition.change}`)
                             initiateHome()
