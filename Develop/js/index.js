@@ -177,7 +177,7 @@ const updateOrDelete = (type, answer) => {
                     if (choice.confirm){
                         query = `DELETE FROM ${table} WHERE ${where} = "${answer}"`
                         
-                        if (type === 'Employee'){
+                        if (type === 'employee'){
                             query = `DELETE FROM ${table} WHERE ${where} = "${lastName}"`
                         }
                         connection.query(query, (err) =>{
@@ -249,16 +249,20 @@ const updateEmployee = (employee) => {
                         type: "list",
                         choices: roleList,
                         message: "What position would you like to change to?"
-                    }).then(pos => {
-                    
-                        let roleID = roleList.filter(id => {
-                             if(pos.change === roleList.title){
-                                return roleList.id
+                    }).then(postition => {
+                        let roleID = 1
+                        for (let i = 0; i < result.length; i++ ){
+                            if (postition.change === result[i].title){
+                                roleID = result[i].id
                             }
-                        })
+                        }
+                        
                         console.log("roleID :", roleID)
-                        // connection.query(`UPDATE employees SET `)
-                        initiateHome()
+                        connection.query(`UPDATE employees SET role_id = ${roleID} `, err => {
+                            if (err) throw err;
+                            console.log(`${res[0].first_name} ${res[0].last_name} has successfully changed postition to ${postition.change}`)
+                            initiateHome()
+                        })
                     })
                 })
             } else {initiateHome()}
